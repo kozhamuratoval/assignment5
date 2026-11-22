@@ -78,3 +78,10 @@ def test_report_json_and_csv(data_file, capsys):
     assert run(["report", "--format", "csv"], capsys).splitlines() == [
         "category,amount", "food,10.0", "TOTAL,10.0",
     ]
+
+
+def test_unknown_format_rejected_before_any_work(data_file, tmp_path):
+    with pytest.raises(SystemExit) as exc:
+        cli.main(["export", str(tmp_path / "o.xml"), "--format", "xml"])
+    assert exc.value.code == 2
+    assert not (tmp_path / "o.xml").exists()

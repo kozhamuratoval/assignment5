@@ -12,12 +12,13 @@ access and no production deployment.
 | Path | Responsibility |
 |---|---|
 | `expense_tracker/cli.py` | argparse commands (`add`, `list`, `report`, `export`); I/O only |
+| `expense_tracker/formatters.py` | Output formats (`text`, `csv`, `json`) behind one `Formatter` interface (Strategy) |
 | `expense_tracker/models.py` | `Expense` dataclass, input validation, totals (pure functions, no I/O) |
 | `expense_tracker/storage.py` | Load/save JSON file; path from `EXPENSES_FILE` env var, default `./expenses.json` |
 | `tests/` | pytest suite; `tests/test_cli.py` covers acceptance criteria AC1–AC5 |
 | `docs/` | Acceptance criteria and recorded check output (`docs/evidence/`) |
 
-Dependency direction: `cli → models`, `cli → storage → models`.
+Dependency direction: `cli → formatters`, `cli → models`, `cli → storage → models`.
 `models.py` must stay free of file, console and environment access.
 
 ## Setup
@@ -40,7 +41,8 @@ git status / git diff / git log          # read-only git
 
 ## Coding conventions
 - Python 3.10+, standard library only for runtime code.
-- Keep functions small; validation lives in `models.make_expense`.
+- Keep functions small; validation lives in `models.make_expense`, formatting in `formatters.py`.
+- New output format = new `Formatter` subclass registered in `FORMATTERS`; never add `if format == ...` branches in `cli.py`.
 - Raise `ValueError` with a clear message for bad user input.
 - No new top-level modules without updating the architecture table above.
 
