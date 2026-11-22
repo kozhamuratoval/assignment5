@@ -4,3 +4,9 @@ __pycache__/
 dist/
 build/
 *.egg-info/
+.ruff_cache/
+.mypy_cache/
+.venv/
+
+# local user data - never commit
+expenses.json

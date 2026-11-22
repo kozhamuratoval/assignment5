@@ -1,0 +1,88 @@
+# baseline behaviour probes @ 8379df8; EXPENSES_FILE=<tmp>/e.json
+$ python -m expense_tracker add -25 food "refund?"
+Added expense #1: -25.00 (food)
+[exit code: 0]
+$ python -m expense_tracker add 0 fun "nothing"
+Added expense #2: 0.00 (fun)
+[exit code: 0]
+$ python -m expense_tracker add 0.1 food a
+Added expense #3: 0.10 (food)
+[exit code: 0]
+$ python -m expense_tracker add 0.2 food b
+Added expense #4: 0.20 (food)
+[exit code: 0]
+$ python -m expense_tracker add 12.50 food "=HYPERLINK(\"http://example.invalid\",\"click\")"
+Added expense #5: 12.50 (food)
+[exit code: 0]
+$ python -m expense_tracker list
+  1  2026-11-22  food          -25.00  refund?
+  2  2026-11-22  fun             0.00  nothing
+  3  2026-11-22  food            0.10  a
+  4  2026-11-22  food            0.20  b
+  5  2026-11-22  food           12.50  =HYPERLINK("http://example.invalid","click")
+[exit code: 0]
+$ python -m expense_tracker report
+food          -12.20
+fun             0.00
+TOTAL         -12.20
+[exit code: 0]
+$ python -m expense_tracker report --format json
+{
+  "by_category": {
+    "food": -12.2,
+    "fun": 0.0
+  },
+  "total": -12.2
+}
+[exit code: 0]
+$ python -m expense_tracker export <tmp>/out.csv
+Exported 5 expenses to <tmp>/out.csv
+[exit code: 0]
+$ cat out.csv
+id,spent_on,category,amount,description
+1,2026-11-22,food,-25.0,refund?
+2,2026-11-22,fun,0.0,nothing
+3,2026-11-22,food,0.1,a
+4,2026-11-22,food,0.2,b
+5,2026-11-22,food,12.5,"=HYPERLINK(""http://example.invalid"",""click"")"
+$ python -m expense_tracker report --format xml
+unknown format xml
+[exit code: 1]
+$ printf '{broken' > e.json && python -m expense_tracker list
+    obj, end = self.scan_once(s, idx)
+               ~~~~~~~~~~~~~~^^^^^^^^
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
+[exit code: 1]
+$ python main.py list   # command from README
+python: can't open file '/home/claude/expense-tracker/main.py': [Errno 2] No such file or directory
+[exit code: 2]
+$ unset EXPENSES_FILE; python -m expense_tracker add 1 fun test (in repo root) && git status --short
+Added expense #1: 1.00 (fun)
+?? expenses.json
+
+# float / non-finite probes (fresh tmp data file)
+$ python -m expense_tracker add 0.1 food a
+Added expense #1: 0.10 (food)
+[exit code: 0]
+$ python -m expense_tracker add 0.2 food b
+Added expense #2: 0.20 (food)
+[exit code: 0]
+$ python -m expense_tracker report --format json
+{
+  "by_category": {
+    "food": 0.30000000000000004
+  },
+  "total": 0.30000000000000004
+}
+[exit code: 0]
+$ python -m expense_tracker add nan fun x
+Added expense #3: nan (fun)
+[exit code: 0]
+$ python -m expense_tracker add inf fun y
+Added expense #4: inf (fun)
+[exit code: 0]
+$ python -m expense_tracker report
+food            0.30
+fun              nan
+TOTAL            nan
+[exit code: 0]
