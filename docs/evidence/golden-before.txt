@@ -1,0 +1,63 @@
+$ add 12.50 food lunch --date 2026-11-01
+Added expense #1: 12.50 (food)
+$ add 3 transport bus --date 2026-11-02
+Added expense #2: 3.00 (transport)
+$ add 900 rent nov --date 2026-11-03
+Added expense #3: 900.00 (rent)
+$ list
+  1  2026-11-01  food           12.50  lunch
+  2  2026-11-02  transport       3.00  bus
+  3  2026-11-03  rent          900.00  nov
+$ report
+food           12.50
+rent          900.00
+transport       3.00
+TOTAL         915.50
+$ report --format csv
+category,amount
+food,12.5
+rent,900.0
+transport,3.0
+TOTAL,915.5
+$ report --format json
+{
+  "by_category": {
+    "food": 12.5,
+    "transport": 3.0,
+    "rent": 900.0
+  },
+  "total": 915.5
+}
+--- export csv
+id,spent_on,category,amount,description
+1,2026-11-01,food,12.5,lunch
+2,2026-11-02,transport,3.0,bus
+3,2026-11-03,rent,900.0,nov
+--- export json
+[
+  {
+    "id": 1,
+    "amount": 12.5,
+    "category": "food",
+    "description": "lunch",
+    "spent_on": "2026-11-01"
+  },
+  {
+    "id": 2,
+    "amount": 3.0,
+    "category": "transport",
+    "description": "bus",
+    "spent_on": "2026-11-02"
+  },
+  {
+    "id": 3,
+    "amount": 900.0,
+    "category": "rent",
+    "description": "nov",
+    "spent_on": "2026-11-03"
+  }
+]
+--- export text
+1 2026-11-01 food 12.5 lunch
+2 2026-11-02 transport 3.0 bus
+3 2026-11-03 rent 900.0 nov

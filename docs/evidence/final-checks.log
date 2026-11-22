@@ -1,0 +1,56 @@
+# final checks @ commit 284faf0 (2026-11-22T12:59:57Z), Python 3.13.18
+$ python -m pytest -q -p no:cacheprovider
+.............................                                            [100%]
+29 passed in 0.06s
+[exit code: 0]
+
+$ ruff check .
+I001 [*] Import block is un-sorted or un-formatted
+ --> expense_tracker/models.py:2:1
+  |
+1 |   """Domain model for expenses."""
+2 | / import math
+3 | | from dataclasses import dataclass, asdict
+4 | | from datetime import date
+  | |_________________________^
+help: Organize imports
+  |
+2 | import math
+  - from dataclasses import dataclass, asdict
+3 + from dataclasses import asdict, dataclass
+4 | from datetime import date
+  -
+5 |
+  |
+
+DTZ011 `datetime.date.today()` used
+  --> expense_tracker/models.py:41:20
+   |
+39 |         raise ValueError(f"unknown category: {category}")
+40 |     if spent_on is None:
+41 |         spent_on = date.today().isoformat()
+   |                    ^^^^^^^^^^^^
+42 |     else:
+43 |         date.fromisoformat(spent_on)  # validate format
+   |
+help: Use `datetime.datetime.now(tz=...).date()` instead
+
+Found 2 errors.
+[*] 1 fixable with the `--fix` option.
+[exit code: 1]
+
+$ mypy expense_tracker
+Success: no issues found in 6 source files
+[exit code: 0]
+
+$ rm -rf dist build *.egg-info && python -m build --wheel -q 2>&1 | tail -3; ls dist
+  - setuptools==84.2.1
+* Building wheel...
+Successfully built expense_tracker-0.1.0-py3-none-any.whl
+expense_tracker-0.1.0-py3-none-any.whl
+[exit code: 0]
+
+$ pip-audit -r requirements.txt 2>&1 | tail -5
+No known vulnerabilities found
+[exit code: 0]
+

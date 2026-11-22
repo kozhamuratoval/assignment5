@@ -1,11 +1,8 @@
 """Command line interface for the expense tracker."""
 import argparse
-import csv
-import io
-import json
-import sys
 
 from . import storage
+from .formatters import FORMATTERS, get_formatter
 from .models import make_expense, total, totals_by_category
 
 
@@ -28,48 +25,15 @@ def cmd_list(args):
 
 def cmd_report(args):
     expenses = storage.load()
-    by_cat = totals_by_category(expenses)
-    if args.format == "text":
-        for cat, amount in sorted(by_cat.items()):
-            print(f"{cat:<10} {amount:>9.2f}")
-        print(f"{'TOTAL':<10} {total(expenses):>9.2f}")
-    elif args.format == "csv":
-        buf = io.StringIO()
-        w = csv.writer(buf)
-        w.writerow(["category", "amount"])
-        for cat, amount in sorted(by_cat.items()):
-            w.writerow([cat, amount])
-        w.writerow(["TOTAL", total(expenses)])
-        print(buf.getvalue(), end="")
-    elif args.format == "json":
-        print(json.dumps({"by_category": by_cat, "total": total(expenses)}, indent=2))
-    else:
-        print(f"unknown format {args.format}")
-        sys.exit(1)
+    formatter = get_formatter(args.format)
+    print(formatter.report(totals_by_category(expenses), total(expenses)), end="")
 
 
 def cmd_export(args):
     expenses = storage.load()
     rows = [e.to_dict() for e in expenses]
-    if args.format == "text":
-        out = "\n".join(
-            f"{r['id']} {r['spent_on']} {r['category']} {r['amount']} {r['description']}"
-            for r in rows
-        ) + "\n"
-    elif args.format == "csv":
-        buf = io.StringIO()
-        w = csv.writer(buf)
-        w.writerow(["id", "spent_on", "category", "amount", "description"])
-        for r in rows:
-            w.writerow([r["id"], r["spent_on"], r["category"], r["amount"], r["description"]])
-        out = buf.getvalue()
-    elif args.format == "json":
-        out = json.dumps(rows, indent=2) + "\n"
-    else:
-        print(f"unknown format {args.format}")
-        sys.exit(1)
     with open(args.output, "w") as f:
-        f.write(out)
+        f.write(get_formatter(args.format).export(rows))
     print(f"Exported {len(rows)} expenses to {args.output}")
 
 
@@ -89,19 +53,23 @@ def build_parser():
     ls.set_defaults(func=cmd_list)
 
     r = sub.add_parser("report", help="totals by category")
-    r.add_argument("--format", default="text")
+    r.add_argument("--format", default="text", choices=sorted(FORMATTERS))
     r.set_defaults(func=cmd_report)
 
     ex = sub.add_parser("export", help="export all expenses to a file")
     ex.add_argument("output")
-    ex.add_argument("--format", default="csv")
+    ex.add_argument("--format", default="csv", choices=sorted(FORMATTERS))
     ex.set_defaults(func=cmd_export)
     return p
 
 
 def main(argv=None):
-    args = build_parser().parse_args(argv)
-    args.func(args)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    try:
+        args.func(args)
+    except ValueError as exc:
+        parser.exit(2, f"error: {exc}\n")
 
 
 if __name__ == "__main__":

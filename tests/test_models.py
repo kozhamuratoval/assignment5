@@ -28,3 +28,9 @@ def test_totals():
     ]
     assert total(items) == 35
     assert totals_by_category(items) == {"food": 15, "rent": 20}
+
+
+@pytest.mark.parametrize("bad", ["-25", "0", "nan", "inf", "-inf", "abc"])
+def test_r01_invalid_amount_rejected(bad):
+    with pytest.raises(ValueError):
+        make_expense(1, bad, "food", "x", "2026-11-01")

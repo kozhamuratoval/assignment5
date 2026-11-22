@@ -1,4 +1,5 @@
 """Domain model for expenses."""
+import math
 from dataclasses import dataclass, asdict
 from datetime import date
 
@@ -31,6 +32,8 @@ class Expense:
 def make_expense(next_id, amount, category, description, spent_on=None):
     """Build a new Expense from raw user input."""
     amount = float(amount)
+    if not math.isfinite(amount) or amount <= 0:
+        raise ValueError(f"amount must be a positive number, got {amount}")
     category = category.lower()
     if category not in CATEGORIES:
         raise ValueError(f"unknown category: {category}")
