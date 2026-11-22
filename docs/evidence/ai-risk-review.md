@@ -2,7 +2,7 @@
 
 **Tool / model:** Claude Opus 5.5 (claude-opus-5-5) in the Claude app's agent workspace, 2026-11-22.
 **Mode:** read-only. No source file was edited during the review. Verification probes ran only against
-throwaway data files (`EXPENSES_FILE=<tmp>`). Code changes came later, in separate commits (`c16430e`, `284faf0`).
+throwaway data files (`EXPENSES_FILE=<tmp>`). Code changes came later, in separate commits (`dc332fc`, `8dce012`).
 **Independence caveat:** the same assistant wrote the project, so this review is not independent.
 The human verification steps in the report are what make it count.
 
