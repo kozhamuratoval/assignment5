@@ -1,0 +1,31 @@
+$ python -m pytest -v -p no:cacheprovider
+tests/test_cli.py::test_ac1_add_then_list PASSED
+tests/test_cli.py::test_ac2_invalid_input_not_saved[argv0] PASSED
+tests/test_cli.py::test_ac2_invalid_input_not_saved[argv1] PASSED
+tests/test_cli.py::test_ac3_report_text_totals PASSED
+tests/test_cli.py::test_ac4_export_formats PASSED
+tests/test_cli.py::test_report_json_and_csv PASSED
+tests/test_cli.py::test_unknown_format_rejected_before_any_work PASSED
+tests/test_cli.py::test_r01_cli_rejects_bad_amount_cleanly[-25] PASSED
+tests/test_cli.py::test_r01_cli_rejects_bad_amount_cleanly[0] PASSED
+tests/test_cli.py::test_r01_cli_rejects_bad_amount_cleanly[nan] PASSED
+tests/test_cli.py::test_r02_csv_export_neutralises_formulas[=HYPERLINK("http://example.invalid","click")] PASSED
+tests/test_cli.py::test_r02_csv_export_neutralises_formulas[+1+1] PASSED
+tests/test_cli.py::test_r02_csv_export_neutralises_formulas[-2+3] PASSED
+tests/test_cli.py::test_r02_csv_export_neutralises_formulas[@SUM(A1)] PASSED
+tests/test_cli.py::test_r02_csv_export_neutralises_formulas[\t=1] PASSED
+tests/test_cli.py::test_r02_normal_text_unchanged PASSED
+tests/test_models.py::test_make_expense_basic PASSED
+tests/test_models.py::test_unknown_category_rejected PASSED
+tests/test_models.py::test_bad_date_rejected PASSED
+tests/test_models.py::test_totals PASSED
+tests/test_models.py::test_r01_invalid_amount_rejected[-25] PASSED
+tests/test_models.py::test_r01_invalid_amount_rejected[0] PASSED
+tests/test_models.py::test_r01_invalid_amount_rejected[nan] PASSED
+tests/test_models.py::test_r01_invalid_amount_rejected[inf] PASSED
+tests/test_models.py::test_r01_invalid_amount_rejected[-inf] PASSED
+tests/test_models.py::test_r01_invalid_amount_rejected[abc] PASSED
+tests/test_storage.py::test_roundtrip PASSED
+tests/test_storage.py::test_missing_file_is_empty PASSED
+tests/test_storage.py::test_next_id PASSED
+============================== 29 passed in 0.09s ==============================
