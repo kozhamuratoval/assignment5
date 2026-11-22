@@ -9,6 +9,16 @@ import json
 
 EXPORT_FIELDS = ["id", "spent_on", "category", "amount", "description"]
 
+# Cells starting with these are run as formulas by Excel/LibreOffice/Sheets.
+FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def safe_cell(value):
+    """Neutralise spreadsheet formula injection in text cells (OWASP CSV Injection)."""
+    if isinstance(value, str) and value.startswith(FORMULA_PREFIXES):
+        return "'" + value
+    return value
+
 
 class Formatter:
     def report(self, by_category: dict[str, float], total: float) -> str:
@@ -36,7 +46,7 @@ class CsvFormatter(Formatter):
         buf = io.StringIO()
         writer = csv.writer(buf)
         writer.writerow(header)
-        writer.writerows(body)
+        writer.writerows([safe_cell(v) for v in row] for row in body)
         return buf.getvalue()
 
     def report(self, by_category, total):

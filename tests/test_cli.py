@@ -95,3 +95,23 @@ def test_r01_cli_rejects_bad_amount_cleanly(data_file, amount, capsys):
     assert "error:" in capsys.readouterr().err
     assert not data_file.exists()
 
+
+@pytest.mark.parametrize("desc", [
+    '=HYPERLINK("http://example.invalid","click")', "+1+1", "-2+3", "@SUM(A1)", "\t=1",
+])
+def test_r02_csv_export_neutralises_formulas(data_file, tmp_path, capsys, desc):
+    # "--" so argparse does not read descriptions like "-2+3" as options
+    run(["add", "--date", "2026-11-01", "5", "food", "--", desc], capsys)
+    out = tmp_path / "o.csv"
+    run(["export", str(out)], capsys)
+    cell = list(csv.reader(out.open()))[1][4]
+    assert cell == "'" + desc
+    # JSON export and stored data keep the original text
+    assert storage.load()[0].description == desc
+
+
+def test_r02_normal_text_unchanged(data_file, tmp_path, capsys):
+    run(["add", "5", "food", "lunch - pizza", "--date", "2026-11-01"], capsys)
+    out = tmp_path / "o.csv"
+    run(["export", str(out)], capsys)
+    assert list(csv.reader(out.open()))[1][4] == "lunch - pizza"

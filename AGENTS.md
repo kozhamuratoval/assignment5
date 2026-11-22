@@ -43,7 +43,8 @@ git status / git diff / git log          # read-only git
 - Python 3.10+, standard library only for runtime code.
 - Keep functions small; validation lives in `models.make_expense`, formatting in `formatters.py`.
 - New output format = new `Formatter` subclass registered in `FORMATTERS`; never add `if format == ...` branches in `cli.py`.
-- Raise `ValueError` with a clear message for bad user input.
+- Raise `ValueError` with a clear message for bad user input; `cli.main` prints `error: ...` and exits with code 2.
+- Any text written to CSV must go through `formatters.safe_cell` (formula-injection guard).
 - No new top-level modules without updating the architecture table above.
 
 ## Test expectations
