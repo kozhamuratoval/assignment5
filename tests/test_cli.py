@@ -85,3 +85,13 @@ def test_unknown_format_rejected_before_any_work(data_file, tmp_path):
         cli.main(["export", str(tmp_path / "o.xml"), "--format", "xml"])
     assert exc.value.code == 2
     assert not (tmp_path / "o.xml").exists()
+
+
+@pytest.mark.parametrize("amount", ["-25", "0", "nan"])
+def test_r01_cli_rejects_bad_amount_cleanly(data_file, amount, capsys):
+    with pytest.raises(SystemExit) as exc:
+        cli.main(["add", amount, "food", "x"])
+    assert exc.value.code == 2
+    assert "error:" in capsys.readouterr().err
+    assert not data_file.exists()
+

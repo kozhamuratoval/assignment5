@@ -64,8 +64,12 @@ def build_parser():
 
 
 def main(argv=None):
-    args = build_parser().parse_args(argv)
-    args.func(args)
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    try:
+        args.func(args)
+    except ValueError as exc:
+        parser.exit(2, f"error: {exc}\n")
 
 
 if __name__ == "__main__":
